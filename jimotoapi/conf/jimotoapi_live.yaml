@@ -1,0 +1,16 @@
+server:
+  scheme: "http"
+  addr : "0.0.0.0:8080"
+
+micro:
+  commodity:
+    name: "api.lgk.com.jimoto.commodity"
+  account:
+    name: "api.lgk.com.jimoto.account"
+
+etcd:
+  addr: "127.0.0.1:2379"
+
+image-server:
+  local: true
+  local-path: "static/image"

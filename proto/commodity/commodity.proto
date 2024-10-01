@@ -1,0 +1,122 @@
+syntax = "proto3";
+
+option go_package = "./commodity";
+
+service Commodity {
+  rpc GetCommodity(GetCommodityRequest) returns (GetCommodityResponse);
+  rpc GetLatestCommodityList(GetLatestCommodityListRequest) returns (GetLatestCommodityListResponse);
+  rpc PublishCommodity(PublishCommodityRequest) returns (PublishCommodityResponse);
+  rpc DeleteCommodity(DeleteCommodityRequest) returns (DeleteCommodityResponse);
+  rpc UpdateCommodity(UpdateCommodityRequest) returns (UpdateCommodityResponse);
+  rpc GetCommodityImages(GetCommodityImagesRequest) returns (GetCommodityImagesResponse);
+  rpc LikeCommodity(LikeCommodityRequest) returns (LikeCommodityResponse);
+  rpc UnlikeCommodity(UnlikeCommodityRequest) returns (UnlikeCommodityResponse);
+  rpc GetCommodityLikedUsers(GetCommodityLikedUsersRequest) returns (GetCommodityLikedUsersResponse);
+  rpc GetUserLikeCommodities(GetUserLikeCommoditiesRequest) returns (GetUserLikeCommoditiesResponse);
+}
+
+message CommodityItem {
+  uint64 id = 1;
+  uint64 creator_id = 2;
+  string title = 3;
+  string detail = 4;
+  uint64 price = 5;
+  string cover = 6;
+  repeated string images = 7;
+  uint32 type = 8;
+  uint32 status = 9;
+}
+
+message GetCommodityRequest {
+  uint64 id = 1;
+  string request_id = 2;
+}
+
+message GetCommodityResponse {
+  CommodityItem commodity = 1;
+}
+
+message GetLatestCommodityListRequest {
+  uint64 limit = 1;
+  uint64 offset = 2;
+  string request_id = 3;
+}
+
+message GetLatestCommodityListResponse {
+  uint64 count = 1;
+  repeated CommodityItem commodity_list = 2;
+}
+
+message PublishCommodityRequest {
+  CommodityItem commodity = 1;
+  string request_id = 2;
+}
+
+message GetCommodityImagesRequest {
+  uint64 id = 1;
+  string request_id = 2;
+}
+
+message PublishCommodityResponse {
+
+}
+
+message DeleteCommodityRequest {
+  uint64 id = 1;
+  string request_id = 2;
+}
+
+message DeleteCommodityResponse {
+
+}
+
+message UpdateCommodityRequest {
+  CommodityItem commodity = 1;
+  string request_id = 2;
+}
+
+message UpdateCommodityResponse {
+
+}
+
+message GetCommodityImagesResponse {
+  repeated string images = 1;
+}
+
+message LikeCommodityRequest {
+  uint64 id = 1;
+  uint64 user_id = 2;
+  string request_id = 3;
+}
+
+message LikeCommodityResponse {
+
+}
+
+message UnlikeCommodityRequest {
+  uint64 id = 1;
+  uint64 user_id = 2;
+  string request_id = 3;
+}
+
+message UnlikeCommodityResponse {
+
+}
+
+message GetCommodityLikedUsersRequest {
+  uint64 id = 1;
+  string request_id = 2;
+}
+
+message GetCommodityLikedUsersResponse {
+  repeated uint64 user_ids = 1;
+}
+
+message GetUserLikeCommoditiesRequest {
+  uint64 id = 1;
+  string request_id = 2;
+}
+
+message GetUserLikeCommoditiesResponse {
+  repeated CommodityItem commodity_list = 1;
+}

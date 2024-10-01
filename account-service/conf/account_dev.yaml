@@ -1,0 +1,25 @@
+mysql-master:
+  driver: "mysql"
+  name: "root"
+  password: "1234qwer"
+  host: "127.0.0.1"
+  port: "3306"
+  db: "account"
+
+mysql-slave:
+  driver: "mysql"
+  name: "root"
+  password: "1234qwer"
+  host: "127.0.0.1"
+  port: "3306"
+  db: "account"
+
+redis:
+  addrs: "127.0.0.1:6379"
+
+etcd:
+  addr: "127.0.0.1:2379"
+
+micro:
+  name: "api.lgk.com.jimoto.account"
+  addr: ":8082"

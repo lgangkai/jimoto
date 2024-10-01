@@ -1,0 +1,1 @@
+ALTER TABLE `commodity_tab` ADD cover varchar(255) NOT NULL;
