@@ -14,6 +14,6 @@ import (
 )
 
 func InitAccountHandler(*dao.DBMaster, *dao.DBSlave, *redis.Client, *golog.Logger) *handler.AccountHandlerImpl {
-	wire.Build(dao.NewAccountDao, biz.NewProfileBiz, service.NewAccountService, biz.NewAccountBiz, handler.NewAccountHandlerImpl)
+	wire.Build(dao.NewUserDao, dao.NewProfileDao, biz.NewProfileBiz, service.NewAccountService, service.NewProfileService, biz.NewAccountBiz, handler.NewAccountHandlerImpl)
 	return &handler.AccountHandlerImpl{}
 }

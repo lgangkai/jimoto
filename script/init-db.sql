@@ -52,3 +52,20 @@ CREATE TABLE `user_tab`
     PRIMARY KEY   (`id`),
     UNIQUE KEY    `email` (`email`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+USE account;
+CREATE TABLE `profile_tab`
+(
+    `id`          bigint unsigned NOT NULL AUTO_INCREMENT,
+    `user_id`     bigint unsigned NOT NULL,
+    `username`    varchar(255) NOT NULL DEFAULT '',
+    `birthday`    DATE,
+    `email`       varchar(255) NOT NULL DEFAULT '',
+    `avatar_url`  varchar(255) NOT NULL DEFAULT '',
+    `is_deleted`  tinyint NOT NULL DEFAULT 0,
+    `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    PRIMARY KEY   (`id`),
+    KEY           `idx_user_id` (`user_id`),
+    UNIQUE KEY    `email` (`email`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

@@ -26,11 +26,11 @@ type UserClaim struct {
 }
 
 type AccountService struct {
-	accountDao *dao.AccountDao
+	accountDao *dao.UserDao
 	logger     *golog.Logger
 }
 
-func NewAccountService(accountDao *dao.AccountDao, logger *golog.Logger) *AccountService {
+func NewAccountService(accountDao *dao.UserDao, logger *golog.Logger) *AccountService {
 	return &AccountService{
 		accountDao: accountDao,
 		logger:     logger,

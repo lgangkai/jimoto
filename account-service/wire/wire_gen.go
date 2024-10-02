@@ -18,10 +18,12 @@ import (
 // Injectors from wire.go:
 
 func InitAccountHandler(dbMaster *dao.DBMaster, dbSlave *dao.DBSlave, client *redis.Client, logger *golog.Logger) *handler.AccountHandlerImpl {
-	accountDao := dao.NewAccountDao(dbMaster, logger)
-	accountService := service.NewAccountService(accountDao, logger)
+	userDao := dao.NewUserDao(dbMaster, logger)
+	accountService := service.NewAccountService(userDao, logger)
 	accountBiz := biz.NewAccountBiz(accountService, logger)
-	profileBiz := biz.NewProfileBiz()
+	profileDao := dao.NewProfileDao(dbMaster, dbSlave, client, logger)
+	profileService := service.NewProfileService(profileDao, logger)
+	profileBiz := biz.NewProfileBiz(profileService, logger)
 	accountHandlerImpl := handler.NewAccountHandlerImpl(accountBiz, profileBiz)
 	return accountHandlerImpl
 }

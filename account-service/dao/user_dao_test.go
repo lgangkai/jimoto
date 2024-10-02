@@ -15,7 +15,7 @@ func TestAccountDao_GetUserByEmail(t *testing.T) {
 		t.Errorf(err.Error())
 		//return
 	}
-	dao := NewAccountDao(&DBMaster{dbm}, golog.Default())
+	dao := NewUserDao(&DBMaster{dbm}, golog.Default())
 	user, err := dao.GetUserByEmail(context.Background(), "123@qq.com")
 	if err != nil {
 		return
@@ -29,7 +29,7 @@ func TestAccountDao_Insert(t *testing.T) {
 		t.Errorf(err.Error())
 		//return
 	}
-	dao := NewAccountDao(&DBMaster{dbm}, golog.Default())
+	dao := NewUserDao(&DBMaster{dbm}, golog.Default())
 	err = dao.Insert(context.Background(), &model.User{
 		Email:    "123@qq.com",
 		Password: "123456",

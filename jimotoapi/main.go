@@ -28,6 +28,14 @@ func main() {
 		accountApi.POST("logout", client.Logout)
 		accountApi.POST("register", client.Register)
 		accountApi.GET("/user/id", client.Authenticate, client.GetUserId)
+
+		profileApi := accountApi.Group("profile")
+		{
+			profileApi.GET("", client.GetProfile)
+			profileApi.POST("", client.CreateProfile)
+			profileApi.PUT("", client.UpdateProfile)
+			profileApi.DELETE("", client.DeleteProfile)
+		}
 	}
 
 	commodityApi := api.Group("commodity")

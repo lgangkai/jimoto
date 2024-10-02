@@ -6,20 +6,20 @@ import (
 	"jimoto/account-service/model"
 )
 
-type AccountDao struct {
+type UserDao struct {
 	db     *DBMaster
 	logger *golog.Logger
 }
 
-func NewAccountDao(db *DBMaster, logger *golog.Logger) *AccountDao {
-	return &AccountDao{
+func NewUserDao(db *DBMaster, logger *golog.Logger) *UserDao {
+	return &UserDao{
 		db:     db,
 		logger: logger,
 	}
 }
 
-func (d *AccountDao) GetUserByEmail(ctx context.Context, email string) (*model.User, error) {
-	d.logger.Info(ctx, "Call AccountDao.GetUserByEmail, email: ", email)
+func (d *UserDao) GetUserByEmail(ctx context.Context, email string) (*model.User, error) {
+	d.logger.Info(ctx, "Call UserDao.GetUserByEmail, email: ", email)
 	user := &model.User{}
 	if err := d.db.Where("email = ?", email).Take(user).Error; err != nil {
 		d.logger.Error(ctx, "Fail to get data, err: ", err.Error())
@@ -29,8 +29,8 @@ func (d *AccountDao) GetUserByEmail(ctx context.Context, email string) (*model.U
 	return user, nil
 }
 
-func (d *AccountDao) Insert(ctx context.Context, user *model.User) error {
-	d.logger.Info(ctx, "Call AccountDao.Insert, user: ", user)
+func (d *UserDao) Insert(ctx context.Context, user *model.User) error {
+	d.logger.Info(ctx, "Call UserDao.Insert, user: ", user)
 	if err := d.db.Create(user).Error; err != nil {
 		d.logger.Error(ctx, "Fail to insert into sql DB, err: ", err.Error())
 		return err
