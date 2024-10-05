@@ -53,9 +53,8 @@ message Profile {
   uint64 id = 1;
   uint64 user_id = 2;
   string username = 3;
-  string birthday = 4;
-  string email =5;
-  string avatar = 6;
+  string email =4;
+  string avatar = 5;
 }
 
 message RegisterRequest {

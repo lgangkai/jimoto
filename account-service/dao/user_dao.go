@@ -31,7 +31,7 @@ func (d *UserDao) GetUserByEmail(ctx context.Context, email string) (*model.User
 
 func (d *UserDao) Insert(ctx context.Context, user *model.User) error {
 	d.logger.Info(ctx, "Call UserDao.Insert, user: ", user)
-	if err := d.db.Create(user).Error; err != nil {
+	if err := d.db.db(ctx).Create(user).Error; err != nil {
 		d.logger.Error(ctx, "Fail to insert into sql DB, err: ", err.Error())
 		return err
 	}

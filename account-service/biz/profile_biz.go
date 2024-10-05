@@ -32,7 +32,6 @@ func (b *ProfileBiz) GetProfile(context context.Context, in *account.GetProfileR
 		Id:       p.Id,
 		UserId:   p.UserId,
 		Username: p.Username,
-		Birthday: p.Birthday,
 		Email:    p.Email,
 		Avatar:   p.AvatarUrl,
 	}
@@ -59,7 +58,6 @@ func (b *ProfileBiz) CreateProfile(traceContext context.Context, in *account.Cre
 		Id:        p.Id,
 		UserId:    p.UserId,
 		Username:  p.Username,
-		Birthday:  p.Birthday,
 		Email:     p.Email,
 		AvatarUrl: p.Avatar,
 	}
@@ -79,7 +77,6 @@ func (b *ProfileBiz) UpdateProfile(traceContext context.Context, in *account.Upd
 		Id:        p.Id,
 		UserId:    p.UserId,
 		Username:  p.Username,
-		Birthday:  p.Birthday,
 		Email:     p.Email,
 		AvatarUrl: p.Avatar,
 	}

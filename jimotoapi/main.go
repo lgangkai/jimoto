@@ -22,6 +22,7 @@ func main() {
 	r.StaticFS("static", http.Dir("static"))
 	api := r.Group("api")
 
+	// init router
 	accountApi := api.Group("account")
 	{
 		accountApi.POST("login", client.Login)
@@ -29,7 +30,7 @@ func main() {
 		accountApi.POST("register", client.Register)
 		accountApi.GET("/user/id", client.Authenticate, client.GetUserId)
 
-		profileApi := accountApi.Group("profile")
+		profileApi := accountApi.Group("profile", client.Authenticate)
 		{
 			profileApi.GET("", client.GetProfile)
 			profileApi.POST("", client.CreateProfile)

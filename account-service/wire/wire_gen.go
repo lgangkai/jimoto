@@ -19,9 +19,9 @@ import (
 
 func InitAccountHandler(dbMaster *dao.DBMaster, dbSlave *dao.DBSlave, client *redis.Client, logger *golog.Logger) *handler.AccountHandlerImpl {
 	userDao := dao.NewUserDao(dbMaster, logger)
-	accountService := service.NewAccountService(userDao, logger)
-	accountBiz := biz.NewAccountBiz(accountService, logger)
 	profileDao := dao.NewProfileDao(dbMaster, dbSlave, client, logger)
+	accountService := service.NewAccountService(userDao, profileDao, dbMaster, logger)
+	accountBiz := biz.NewAccountBiz(accountService, logger)
 	profileService := service.NewProfileService(profileDao, logger)
 	profileBiz := biz.NewProfileBiz(profileService, logger)
 	accountHandlerImpl := handler.NewAccountHandlerImpl(accountBiz, profileBiz)

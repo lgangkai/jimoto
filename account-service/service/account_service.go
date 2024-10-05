@@ -27,12 +27,16 @@ type UserClaim struct {
 
 type AccountService struct {
 	accountDao *dao.UserDao
+	profileDao *dao.ProfileDao
+	db         *dao.DBMaster
 	logger     *golog.Logger
 }
 
-func NewAccountService(accountDao *dao.UserDao, logger *golog.Logger) *AccountService {
+func NewAccountService(accountDao *dao.UserDao, profileDao *dao.ProfileDao, db *dao.DBMaster, logger *golog.Logger) *AccountService {
 	return &AccountService{
 		accountDao: accountDao,
+		profileDao: profileDao,
+		db:         db,
 		logger:     logger,
 	}
 }
@@ -52,17 +56,25 @@ func (s *AccountService) Register(ctx context.Context, email string, password st
 		return errs.New(errs.ERR_REGISTER_INTERNAL)
 	}
 
-	// 2. save email and password.
+	// 2. save email and password. and create a default profile
 	user = &model.User{
 		Password: pswMd5Encode(password),
 		Email:    email,
 	}
-	err = s.accountDao.Insert(ctx, user)
-	if err != nil {
-		s.logger.Error(ctx, "Insert user failed, err: ", err.Error())
-		return errs.New(errs.ERR_REGISTER_INTERNAL)
-	}
-	return nil
+	// start transaction
+	return s.db.ExecTx(ctx, func(ctx context.Context) error {
+		err = s.accountDao.Insert(ctx, user)
+		// get id after insert
+		err = s.profileDao.Insert(ctx, &model.Profile{
+			UserId: user.Id,
+			Email:  email,
+		})
+		if err != nil {
+			s.logger.Error(ctx, "Insert user/profile failed, err: ", err.Error())
+			return errs.New(errs.ERR_REGISTER_INTERNAL)
+		}
+		return nil
+	})
 }
 
 func (s *AccountService) Login(ctx context.Context, email string, password string) (*string, *uint64, error) {

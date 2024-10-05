@@ -20,6 +20,12 @@ type Commodity struct {
 	Status uint32 `json:"status"`
 }
 
+type CreateProfileRequest struct {
+	Username string `form:"username"`
+	Birthday string `form:"birthday"`
+	Email    string `form:"email"`
+}
+
 type Image struct {
 	Image string `json:"image"`
 }

@@ -88,7 +88,7 @@ func (d *ProfileDao) Update(ctx context.Context, profile *model.Profile) error {
 	// use cache aside pattern to update DB and then delete from cache.
 	// 1. update data to mysql-master.
 	d.logger.Info(ctx, "Call ProfileDao.Update.")
-	if err := d.dbMaster.Save(profile).Error; err != nil {
+	if err := d.dbMaster.db(ctx).Save(profile).Error; err != nil {
 		d.logger.Error(ctx, "Fail to update to sql DB, err: ", err.Error())
 		return err
 	}
@@ -109,7 +109,7 @@ func (d *ProfileDao) Delete(ctx context.Context, userId uint64) error {
 	//	d.logger.Error(ctx, "Fail to delete from sql DB, err: ", err.Error())
 	//	return err
 	//}
-	if err := d.dbMaster.Save(&model.Profile{UserId: userId, IsDeleted: true}).Error; err != nil {
+	if err := d.dbMaster.db(ctx).Save(&model.Profile{UserId: userId, IsDeleted: true}).Error; err != nil {
 		d.logger.Error(ctx, "Fail to delete from sql DB, err: ", err.Error())
 		return err
 	}
@@ -125,7 +125,7 @@ func (d *ProfileDao) Insert(ctx context.Context, profile *model.Profile) error {
 	// we don't operate cache in insert. Cache data will be load when read.
 	d.logger.Info(ctx, "Call ProfileDao.Insert, profile: ", profile)
 
-	if err := d.dbMaster.Create(profile).Error; err != nil {
+	if err := d.dbMaster.db(ctx).Create(profile).Error; err != nil {
 		d.logger.Error(ctx, "Fail to insert into sql DB, err: ", err.Error())
 		return err
 	}

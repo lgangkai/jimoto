@@ -1,6 +1,7 @@
 package dao
 
 import (
+	"context"
 	"gorm.io/gorm"
 )
 
@@ -11,4 +12,21 @@ type DBMaster struct {
 }
 type DBSlave struct {
 	*gorm.DB
+}
+
+type contextTxKey struct{}
+
+func (d *DBMaster) ExecTx(ctx context.Context, fn func(ctx context.Context) error) error {
+	return d.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
+		ctx = context.WithValue(ctx, contextTxKey{}, tx)
+		return fn(ctx)
+	})
+}
+
+func (d *DBMaster) db(ctx context.Context) *DBMaster {
+	tx, ok := ctx.Value(contextTxKey{}).(*gorm.DB)
+	if ok {
+		return &DBMaster{tx}
+	}
+	return d
 }

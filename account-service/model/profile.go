@@ -6,7 +6,6 @@ type Profile struct {
 	Id        uint64 `json:"id"`
 	UserId    uint64 `json:"user_id"`
 	Username  string `json:"username"`
-	Birthday  string `json:"birthday"`
 	Email     string `json:"email"`
 	AvatarUrl string `json:"avatar_url"`
 	IsDeleted bool   `json:"is_deleted"`
