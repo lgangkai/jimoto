@@ -1,21 +1,20 @@
 package main
 
 import (
-	"commodity-service/conf"
-	"commodity-service/dao"
-	"commodity-service/wire"
 	"flag"
 	"fmt"
 	"github.com/asim/go-micro/plugins/registry/etcd/v3"
 	"github.com/asim/go-micro/v3"
 	"github.com/asim/go-micro/v3/registry"
-	_ "github.com/jinzhu/gorm/dialects/mysql"
 	"github.com/lgangkai/golog"
 	"github.com/redis/go-redis/v9"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
+	"jimoto/order-service/conf"
+	"jimoto/order-service/dao"
+	"jimoto/order-service/wire"
 	"log"
-	"protos/commodity"
+	"protos/order"
 )
 
 type Server struct {
@@ -26,7 +25,7 @@ func (s *Server) Init() error {
 	log.Println("Init server...")
 	// 1. load config file.
 	var confPath string
-	flag.StringVar(&confPath, "config", "conf/commodity_live.yaml", "define config file")
+	flag.StringVar(&confPath, "config", "conf/order_live.yaml", "define config file")
 	flag.Parse()
 	config, err := conf.LoadConfig(confPath)
 	if err != nil {
@@ -71,7 +70,7 @@ func (s *Server) Init() error {
 	lgr := golog.Default()
 
 	// 4. injection.
-	commodityHandler := wire.InitCommodityHandler(
+	orderHandler := wire.InitOrderHandler(
 		&dao.DBMaster{DB: sqlMaster},
 		&dao.DBSlave{DB: sqlSlave},
 		rdb,
@@ -80,9 +79,9 @@ func (s *Server) Init() error {
 
 	// 5. init service
 	s.service.Init()
-	err = commodity.RegisterCommodityHandler(s.service.Server(), commodityHandler)
+	err = order.RegisterOrderHandler(s.service.Server(), orderHandler)
 	if err != nil {
-		log.Println("register CommodityHandler failed, err: ", err.Error())
+		log.Println("register OrderHandler failed, err: ", err.Error())
 		return err
 	}
 

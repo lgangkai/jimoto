@@ -1,0 +1,13 @@
+syntax = "proto3";
+
+option go_package = "./order";
+
+service Order {
+  rpc CreateOrder(CreateOrderRequest) returns (CreateOrderResponse);
+}
+
+message CreateOrderRequest {
+  string request_id = 1;
+}
+
+message CreateOrderResponse {}

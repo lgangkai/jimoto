@@ -24,11 +24,6 @@ func (c *Client) UploadImage(context *gin.Context) {
 	}
 	ud := uuid.New().String()
 	ufn := ud + suffix
-	rsp, err := json.Marshal(&UploadResp{Filename: ufn})
-	if err != nil {
-		c.HandleJsonError(context, err)
-		return
-	}
 
 	out, err := os.Create(fmt.Sprintf("%v/%v", c.config.ImageServer.LocalPath, ufn))
 	if err != nil {
@@ -40,6 +35,15 @@ func (c *Client) UploadImage(context *gin.Context) {
 	_, err = io.Copy(out, file)
 	if err != nil {
 		c.HandleRequestError(context, err)
+		return
+	}
+
+	rsp, err := json.Marshal(&UploadResp{
+		Url:      c.CompleteImageUrl(ufn),
+		Filename: ufn,
+	})
+	if err != nil {
+		c.HandleJsonError(context, err)
 		return
 	}
 	c.HandleSuccess(context, rsp)

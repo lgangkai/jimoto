@@ -68,3 +68,6 @@ CREATE TABLE `profile_tab`
     KEY           `idx_user_id` (`user_id`),
     UNIQUE KEY    `email` (`email`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE DATABASE `order`;
+
