@@ -125,7 +125,7 @@ func (d *CommodityDao) Update(ctx context.Context, commodity *model2.Commodity) 
 	// use cache aside pattern to update DB and then delete from cache.
 	// 1. update data to mysql-master.
 	d.logger.Info(ctx, "Call CommodityDao.Update.")
-	if err := d.dbMaster.db(ctx).Save(commodity).Error; err != nil {
+	if err := d.dbMaster.db(ctx).Where("id = ? ", commodity.Id).UpdateColumns(commodity).Error; err != nil {
 		d.logger.Error(ctx, "Fail to update to sql DB, err: ", err.Error())
 		return err
 	}

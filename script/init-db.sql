@@ -9,6 +9,8 @@ CREATE TABLE `commodity_tab`
     `price` bigint unsigned NOT NULL DEFAULT 0 COMMENT 'price of the commodity',
     `cover` varchar(255) NOT NULL COMMENT 'cover image url of the commodity',
     `type` tinyint(3) unsigned NOT NULL DEFAULT 0 COMMENT '0-sell, 1-buy, 2-request',
+    `latitude` varchar(255) NOT NULL DEFAULT '0.0' COMMENT 'latitude of location where commodity be created.',
+    `longitude` varchar(255) NOT NULL DEFAULT '0.0' COMMENT 'longitude of location where commodity be created.',
     `status` tinyint(3) unsigned NOT NULL DEFAULT 0 COMMENT '0-publishing, 1-done, 2-removed',
     `is_deleted` bool NOT NULL DEFAULT 0 COMMENT '0-not deleted, 1-deleted',
     `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,

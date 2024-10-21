@@ -5,10 +5,12 @@ import (
 )
 
 type PublishRequest struct {
-	Title  string `form:"title"`
-	Detail string `form:"detail"`
-	Price  uint64 `form:"price"`
-	Images string `form:"images"`
+	Title     string  `form:"title"`
+	Detail    string  `form:"detail"`
+	Price     uint64  `form:"price"`
+	Images    string  `form:"images"`
+	Latitude  float64 `form:"latitude"`
+	Longitude float64 `form:"longitude"`
 }
 
 type Commodity struct {
@@ -24,6 +26,12 @@ type CreateProfileRequest struct {
 	Username string `form:"username"`
 	Birthday string `form:"birthday"`
 	Email    string `form:"email"`
+}
+
+type UpdateProfileRequest struct {
+	Username     string `form:"username"`
+	Introduction string `form:"introduction"`
+	AvatarUrl    string `form:"avatar_url"`
 }
 
 type Image struct {

@@ -45,6 +45,8 @@ func (b *CommodityBiz) GetCommodity(ctx context.Context, in *cmdt.GetCommodityRe
 		Images:    imgs,
 		Type:      c.Type,
 		Status:    c.Status,
+		Latitude:  c.Latitude,
+		Longitude: c.Longitude,
 	}
 	b.logger.Info(ctx, "Call CommodityBiz.GetCommodity successfully.")
 	return nil
@@ -68,6 +70,8 @@ func (b *CommodityBiz) GetLatestCommodityList(ctx context.Context, in *cmdt.GetL
 			Cover:     c.Cover,
 			Type:      c.Type,
 			Status:    c.Status,
+			Latitude:  c.Latitude,
+			Longitude: c.Longitude,
 		})
 	}
 	b.logger.Info(ctx, "Call CommodityBiz.GetLatestCommodityList successfully.")
@@ -86,6 +90,8 @@ func (b *CommodityBiz) UpdateCommodity(ctx context.Context, in *cmdt.UpdateCommo
 		Cover:     c.Cover,
 		Type:      c.Type,
 		Status:    c.Status,
+		Latitude:  c.Latitude,
+		Longitude: c.Longitude,
 	}
 	err := b.commodityService.UpdateCommodity(ctx, mc)
 	if err != nil {
@@ -120,6 +126,8 @@ func (b *CommodityBiz) PublishCommodity(ctx context.Context, in *cmdt.PublishCom
 		Cover:     c.Cover,
 		Type:      c.Type,
 		Status:    c.Status,
+		Latitude:  c.Latitude,
+		Longitude: c.Longitude,
 		IsDeleted: false,
 	}
 	err := b.commodityService.PublishCommodity(ctx, mc, in.GetCommodity().Images)
@@ -194,6 +202,8 @@ func (b *CommodityBiz) GetUserLikeCommodities(ctx context.Context, in *cmdt.GetU
 			Cover:     c.Cover,
 			Type:      c.Type,
 			Status:    c.Status,
+			Latitude:  c.Latitude,
+			Longitude: c.Longitude,
 		})
 	}
 	return nil

@@ -88,7 +88,7 @@ func (d *ProfileDao) Update(ctx context.Context, profile *model.Profile) error {
 	// use cache aside pattern to update DB and then delete from cache.
 	// 1. update data to mysql-master.
 	d.logger.Info(ctx, "Call ProfileDao.Update.")
-	if err := d.dbMaster.db(ctx).Save(profile).Error; err != nil {
+	if err := d.dbMaster.db(ctx).Where("user_id = ? ", profile.UserId).UpdateColumns(profile).Error; err != nil {
 		d.logger.Error(ctx, "Fail to update to sql DB, err: ", err.Error())
 		return err
 	}

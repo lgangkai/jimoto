@@ -25,6 +25,8 @@ message CommodityItem {
   repeated string images = 7;
   uint32 type = 8;
   uint32 status = 9;
+  double latitude = 10;
+  double longitude = 11;
 }
 
 message GetCommodityRequest {

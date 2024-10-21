@@ -4,15 +4,26 @@ import (
 	"encoding/json"
 	"github.com/gin-gonic/gin"
 	"protos/account"
+	"strconv"
 )
 
 func (c *Client) GetProfile(context *gin.Context) {
-	uId := c.getAuthedData(context, KEY_USER_ID)
-	if uId == nil {
-		return
+	var uId uint64
+	// 1. if query param exists, use query param.
+	uIdQ := context.Query(KEY_USER_ID)
+	if uIdQ != "" {
+		uIdI, _ := strconv.Atoi(uIdQ)
+		uId = uint64(uIdI)
+	} else {
+		// 2. else use auth data
+		uIdA := c.getAuthedData(context, KEY_USER_ID)
+		if uIdA == nil {
+			return
+		}
+		uId = uIdA.(uint64)
 	}
 	r := &account.GetProfileRequest{
-		UserId:    uId.(uint64),
+		UserId:    uId,
 		RequestId: GetRequestId(context),
 	}
 	resp, err := c.accountClient.GetProfile(context, r)
@@ -55,7 +66,26 @@ func (c *Client) CreateProfile(context *gin.Context) {
 }
 
 func (c *Client) UpdateProfile(context *gin.Context) {
-	//uId := c.getAuthedData(context, KEY_USER_ID)
+	uId := c.getAuthedData(context, KEY_USER_ID)
+	p := &UpdateProfileRequest{}
+	if err := context.ShouldBind(p); err != nil {
+		c.HandleRequestError(context, err)
+		return
+	}
+	r := &account.UpdateProfileRequest{
+		Profile: &account.Profile{
+			UserId:   uId.(uint64),
+			Username: p.Username,
+			Avatar:   p.AvatarUrl,
+		},
+		RequestId: GetRequestId(context),
+	}
+	_, err := c.accountClient.UpdateProfile(context, r)
+	if err != nil {
+		c.HandleRpcError(context, err)
+		return
+	}
+	c.HandleSuccess(context, nil)
 }
 
 func (c *Client) DeleteProfile(context *gin.Context) {

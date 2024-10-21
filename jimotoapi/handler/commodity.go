@@ -23,6 +23,8 @@ func (c *Client) PublishCommodity(context *gin.Context) {
 		Price:     p.Price,
 		Images:    imgs,
 		Cover:     imgs[0],
+		Latitude:  p.Latitude,
+		Longitude: p.Longitude,
 	}
 	pr := &commodity.PublishCommodityRequest{
 		Commodity: cm,
