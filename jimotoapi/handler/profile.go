@@ -3,6 +3,8 @@ package handler
 import (
 	"encoding/json"
 	"github.com/gin-gonic/gin"
+	"jimotoapi/util"
+	"jimotoapi/vo"
 	"protos/account"
 	"strconv"
 )
@@ -32,7 +34,7 @@ func (c *Client) GetProfile(context *gin.Context) {
 		return
 	}
 	pr := resp.GetProfile()
-	pr.Avatar = c.CompleteImageUrl(pr.Avatar)
+	pr.Avatar = util.CompleteImageUrl(pr.Avatar, c.config)
 	prj, err := json.Marshal(pr)
 	if err != nil {
 		c.HandleJsonError(context, err)
@@ -44,7 +46,7 @@ func (c *Client) GetProfile(context *gin.Context) {
 
 func (c *Client) CreateProfile(context *gin.Context) {
 	uId := c.getAuthedData(context, KEY_USER_ID)
-	p := &CreateProfileRequest{}
+	p := &vo.CreateProfileReq{}
 	if err := context.ShouldBind(p); err != nil {
 		c.HandleRequestError(context, err)
 		return
@@ -67,7 +69,7 @@ func (c *Client) CreateProfile(context *gin.Context) {
 
 func (c *Client) UpdateProfile(context *gin.Context) {
 	uId := c.getAuthedData(context, KEY_USER_ID)
-	p := &UpdateProfileRequest{}
+	p := &vo.UpdateProfileReq{}
 	if err := context.ShouldBind(p); err != nil {
 		c.HandleRequestError(context, err)
 		return

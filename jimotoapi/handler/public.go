@@ -6,6 +6,8 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	"io"
+	"jimotoapi/util"
+	"jimotoapi/vo"
 	"os"
 	"strings"
 )
@@ -38,8 +40,8 @@ func (c *Client) UploadImage(context *gin.Context) {
 		return
 	}
 
-	rsp, err := json.Marshal(&UploadResp{
-		Url:      c.CompleteImageUrl(ufn),
+	rsp, err := json.Marshal(&vo.UploadResp{
+		Url:      util.CompleteImageUrl(ufn, c.config),
 		Filename: ufn,
 	})
 	if err != nil {
@@ -47,22 +49,4 @@ func (c *Client) UploadImage(context *gin.Context) {
 		return
 	}
 	c.HandleSuccess(context, rsp)
-}
-
-func (c *Client) CompleteImageUrl(filename string) string {
-	if c.config.ImageServer.Local {
-		if filename == "" {
-			return ""
-		}
-		return fmt.Sprintf("%v://%v/%v/%v", c.config.Server.Scheme, c.config.Server.Addr, c.config.ImageServer.LocalPath, filename)
-	}
-	return ""
-}
-
-func (c *Client) CompleteImageUrls(filenames []string) []string {
-	rst := make([]string, len(filenames))
-	for i, filename := range filenames {
-		rst[i] = c.CompleteImageUrl(filename)
-	}
-	return rst
 }

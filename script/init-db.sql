@@ -72,4 +72,15 @@ CREATE TABLE `profile_tab`
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE DATABASE `order`;
+USE `order`;
+CREATE TABLE `order_tab`
+(
+    `id` bigint unsigned NOT NULL,
+    `commodity_id` bigint unsigned NOT NULL,
+    `creator_id` bigint unsigned NOT NULL,
+    `status` tinyint NOT NULL DEFAULT 0,
+    `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    PRIMARY KEY   (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 

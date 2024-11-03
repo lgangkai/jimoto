@@ -57,6 +57,7 @@ func main() {
 
 	commoditiesApi := api.Group("commodities")
 	{
+		commoditiesApi.GET("", client.GetCommodities)
 		commoditiesApi.GET("latest", client.GetLatestCommodityList)
 		commoditiesApi.GET("liked", client.Authenticate, client.GetUserLikeCommodities)
 	}

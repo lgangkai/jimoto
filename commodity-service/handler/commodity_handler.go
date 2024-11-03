@@ -54,6 +54,10 @@ func (h *CommodityHandlerImpl) GetUserLikeCommodities(ctx context.Context, in *c
 	return h.commodityBiz.GetUserLikeCommodities(getTraceContext(ctx, in.RequestId, in.Id), in, out)
 }
 
+func (h *CommodityHandlerImpl) GetCommodities(ctx context.Context, in *commodity.GetCommoditiesRequest, out *commodity.GetCommoditiesResponse) error {
+	return h.commodityBiz.GetCommodities(getTraceContext(ctx, in.RequestId, 0), in, out)
+}
+
 func getTraceContext(ctx context.Context, requestId string, commodityId uint64) context.Context {
 	return context.WithValue(ctx, "traceKey", map[string]any{
 		"request_id":   requestId,

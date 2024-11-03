@@ -11,7 +11,7 @@ import (
 
 const (
 	KEY_REQUEST_ID     = "request_id"
-	KEY_ACCESS_TOKEN   = "access_token"
+	KEY_ACCESS_TOKEN   = "Authorization"
 	KEY_USER_ID        = "user_id"
 	KEY_EMAIL          = "email"
 	COOKIE_EXPIRE_TIME = 3600 * 24 * 30
@@ -52,9 +52,9 @@ func (c *Client) Cors(ctx *gin.Context) {
 
 func (c *Client) Authenticate(context *gin.Context) {
 	c.logger.Info(c.context, "Authenticate for api request.")
-	token, err := context.Cookie(KEY_ACCESS_TOKEN)
-	if err != nil {
-		c.logger.Error(c.context, "Get access_token from cookie failed, err: ", err.Error())
+	token := context.GetHeader(KEY_ACCESS_TOKEN)
+	if token == "" {
+		c.logger.Error(c.context, "Get access_token from header failed")
 		context.JSON(http.StatusUnauthorized, gin.H{
 			"code": errs.ERR_AUTH_FAILED,
 			"msg":  errs.GetMsg(errs.ERR_AUTH_FAILED),

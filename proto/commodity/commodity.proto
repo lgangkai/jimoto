@@ -2,6 +2,19 @@ syntax = "proto3";
 
 option go_package = "./commodity";
 
+enum FilterType {
+  ALL = 0;
+  PUBLISHING = 1;
+}
+
+enum OrderType {
+  LATEST = 0;
+  NEAREST = 1;
+  CHEAPEST = 2;
+  HIGHEST = 3;
+  MOST_LIKED = 4;
+}
+
 service Commodity {
   rpc GetCommodity(GetCommodityRequest) returns (GetCommodityResponse);
   rpc GetLatestCommodityList(GetLatestCommodityListRequest) returns (GetLatestCommodityListResponse);
@@ -13,6 +26,7 @@ service Commodity {
   rpc UnlikeCommodity(UnlikeCommodityRequest) returns (UnlikeCommodityResponse);
   rpc GetCommodityLikedUsers(GetCommodityLikedUsersRequest) returns (GetCommodityLikedUsersResponse);
   rpc GetUserLikeCommodities(GetUserLikeCommoditiesRequest) returns (GetUserLikeCommoditiesResponse);
+  rpc GetCommodities(GetCommoditiesRequest) returns (GetCommoditiesResponse);
 }
 
 message CommodityItem {
@@ -102,7 +116,6 @@ message UnlikeCommodityRequest {
 }
 
 message UnlikeCommodityResponse {
-
 }
 
 message GetCommodityLikedUsersRequest {
@@ -121,4 +134,17 @@ message GetUserLikeCommoditiesRequest {
 
 message GetUserLikeCommoditiesResponse {
   repeated CommodityItem commodity_list = 1;
+}
+
+message GetCommoditiesRequest {
+  uint64 limit = 1;
+  uint64 offset = 2;
+  FilterType filter_type = 3;
+  OrderType order_type = 4;
+  string request_id = 5;
+}
+
+message GetCommoditiesResponse {
+  uint64 count = 1;
+  repeated CommodityItem commodity_list = 2;
 }

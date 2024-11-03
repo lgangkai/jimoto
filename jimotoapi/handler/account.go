@@ -4,12 +4,13 @@ import (
 	"encoding/json"
 	errs "errs"
 	"github.com/gin-gonic/gin"
+	"jimotoapi/vo"
 	"net/http"
 	"protos/account"
 )
 
 func (c *Client) Login(context *gin.Context) {
-	login := &AccountRequest{}
+	login := &vo.AccountReq{}
 	if err := context.ShouldBind(login); err != nil {
 		c.HandleRequestError(context, err)
 		return
@@ -26,8 +27,7 @@ func (c *Client) Login(context *gin.Context) {
 	}
 
 	c.logger.Info(c.context, "Handle login success.")
-	context.SetCookie(KEY_ACCESS_TOKEN, resp.GetToken(), COOKIE_EXPIRE_TIME, "/", "", false, false)
-	loginRespJson, err := json.Marshal(&LoginResp{UserId: resp.GetUserId()})
+	loginRespJson, err := json.Marshal(&vo.LoginResp{AccessToken: resp.GetToken()})
 	if err != nil {
 		c.HandleJsonError(context, err)
 		return
@@ -37,7 +37,7 @@ func (c *Client) Login(context *gin.Context) {
 }
 
 func (c *Client) Register(context *gin.Context) {
-	reg := &AccountRequest{}
+	reg := &vo.AccountReq{}
 	if err := context.ShouldBind(reg); err != nil {
 		c.HandleRequestError(context, err)
 		return
@@ -69,7 +69,7 @@ func (c *Client) GetUserId(context *gin.Context) {
 		context.Abort()
 		return
 	}
-	marshal, err := json.Marshal(&User{UserId: value.(uint64)})
+	marshal, err := json.Marshal(&vo.User{UserId: value.(uint64)})
 	if err != nil {
 		c.HandleJsonError(context, err)
 		return

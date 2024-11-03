@@ -3,14 +3,39 @@ package handler
 import (
 	"encoding/json"
 	"github.com/gin-gonic/gin"
+	"jimotoapi/util"
+	"jimotoapi/vo"
 	"protos/commodity"
 	"strconv"
 	"strings"
 )
 
+const (
+	PARAM_KEY_FILTER_TYPE = "filter_type"
+	PARAM_KEY_ORDER_TYPE  = "order_type"
+	PARAM_KEY_PAGE        = "page"
+	PARAM_KEY_PAGE_SIZE   = "page_size"
+)
+
+var (
+	PARAM_FILTER_MAP = map[string]commodity.FilterType{
+		"":           commodity.FilterType_ALL,
+		"all":        commodity.FilterType_ALL,
+		"publishing": commodity.FilterType_PUBLISHING,
+	}
+	PARAM_ORDER_MAP = map[string]commodity.OrderType{
+		"":           commodity.OrderType_LATEST,
+		"latest":     commodity.OrderType_LATEST,
+		"nearest":    commodity.OrderType_NEAREST,
+		"cheapest":   commodity.OrderType_CHEAPEST,
+		"highest":    commodity.OrderType_HIGHEST,
+		"most-liked": commodity.OrderType_MOST_LIKED,
+	}
+)
+
 func (c *Client) PublishCommodity(context *gin.Context) {
 	uId := c.getAuthedData(context, KEY_USER_ID)
-	p := &PublishRequest{}
+	p := &vo.PublishReq{}
 	if err := context.ShouldBind(p); err != nil {
 		c.HandleRequestError(context, err)
 		return
@@ -51,7 +76,7 @@ func (c *Client) GetCommodity(context *gin.Context) {
 	}
 
 	cr := resp.GetCommodity()
-	cr.Images = c.CompleteImageUrls(cr.Images)
+	cr.Images = util.CompleteImageUrls(cr.Images, c.config)
 	cm, err := json.Marshal(cr)
 	if err != nil {
 		c.HandleJsonError(context, err)
@@ -59,6 +84,38 @@ func (c *Client) GetCommodity(context *gin.Context) {
 	}
 	c.logger.Info(c.context, "Handle get commodity success, commodity: ", string(cm))
 	c.HandleSuccess(context, cm)
+}
+
+func (c *Client) GetCommodities(context *gin.Context) {
+	fType := context.Query(PARAM_KEY_FILTER_TYPE)
+	oType := context.Query(PARAM_KEY_ORDER_TYPE)
+	page := context.Query(PARAM_KEY_PAGE)
+	pageSize := context.Query(PARAM_KEY_PAGE_SIZE)
+	r := &commodity.GetCommoditiesRequest{
+		Limit:      uint64(util.Str2Num(pageSize)),
+		Offset:     uint64(util.Str2Num(page) - 1),
+		FilterType: PARAM_FILTER_MAP[fType],
+		OrderType:  PARAM_ORDER_MAP[oType],
+		RequestId:  GetRequestId(context),
+	}
+	resp, err := c.commodityClient.GetCommodities(context, r)
+	if err != nil {
+		c.HandleRpcError(context, err)
+		return
+	}
+
+	rsp := vo.GetCommoditiesResp{
+		Commodities: vo.FromCommodityList(resp.GetCommodityList(), c.config),
+		Count:       resp.GetCount(),
+	}
+	cms, err := json.Marshal(rsp)
+	if err != nil {
+		c.HandleJsonError(context, err)
+		return
+	}
+
+	c.logger.Info(c.context, "Handle get commodity list success, commodities: ", string(cms))
+	c.HandleSuccess(context, cms)
 }
 
 func (c *Client) GetLatestCommodityList(context *gin.Context) {
@@ -73,8 +130,7 @@ func (c *Client) GetLatestCommodityList(context *gin.Context) {
 		return
 	}
 
-	cl := FromList(resp.GetCommodityList())
-	cl.CompleteImageUrlForList(c)
+	cl := vo.FromCommodityList(resp.GetCommodityList(), c.config)
 	cms, err := json.Marshal(cl)
 	if err != nil {
 		c.HandleJsonError(context, err)
@@ -97,9 +153,9 @@ func (c *Client) GetCommodityImages(context *gin.Context) {
 		return
 	}
 
-	cis := make([]*Image, len(resp.Images))
+	cis := make([]*vo.Image, len(resp.Images))
 	for i, image := range resp.Images {
-		cis[i] = &Image{Image: c.CompleteImageUrl(image)}
+		cis[i] = &vo.Image{Image: util.CompleteImageUrl(image, c.config)}
 	}
 	cms, err := json.Marshal(cis)
 	if err != nil {
@@ -160,9 +216,9 @@ func (c *Client) GetLikedUsers(context *gin.Context) {
 		c.HandleRpcError(context, err)
 		return
 	}
-	users := make([]*User, len(resp.UserIds))
+	users := make([]*vo.User, len(resp.UserIds))
 	for i, id := range resp.UserIds {
-		users[i] = &User{UserId: id}
+		users[i] = &vo.User{UserId: id}
 	}
 	urs, err := json.Marshal(users)
 	if err != nil {
@@ -187,8 +243,7 @@ func (c *Client) GetUserLikeCommodities(context *gin.Context) {
 		c.HandleRpcError(context, err)
 		return
 	}
-	cl := FromList(resp.GetCommodityList())
-	cl.CompleteImageUrlForList(c)
+	cl := vo.FromCommodityList(resp.GetCommodityList(), c.config)
 	cms, err := json.Marshal(cl)
 	if err != nil {
 		c.HandleJsonError(context, err)

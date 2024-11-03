@@ -9,6 +9,7 @@ import (
 	"github.com/lgangkai/golog"
 	"github.com/redis/go-redis/v9"
 	"math/rand"
+	cmdt "protos/commodity"
 	"time"
 )
 
@@ -82,6 +83,35 @@ func (d *CommodityDao) GetById(ctx context.Context, id uint64) (*model2.Commodit
 		", expiration: ", REDIS_KEY_GET_COMMODITY_EXPIRE_BASE+randExp)
 
 	return commodity, nil
+}
+
+func (d *CommodityDao) GetListByFilter(ctx context.Context, filterType cmdt.FilterType, orderType cmdt.OrderType, pageSize uint64, offset uint64) ([]*model2.Commodity, int64, error) {
+	d.logger.Info(ctx, "Call CommodityDao.GetListByFilter.")
+	var cmList []*model2.Commodity
+	var orderPhrase string
+	var count int64
+	switch orderType {
+	case cmdt.OrderType_LATEST:
+		orderPhrase = "update_time desc"
+	case cmdt.OrderType_CHEAPEST:
+		orderPhrase = "price asc"
+	case cmdt.OrderType_HIGHEST:
+		orderPhrase = "price desc"
+	default:
+		orderPhrase = "update_time desc"
+	}
+	var err error
+	if filterType == cmdt.FilterType_ALL {
+		err = d.dbSlave.Table(model2.TAB_NAME_COMMODITY).Where("is_deleted = ?", false).Limit(int(pageSize)).Order(orderPhrase).Offset(int(offset)).Find(&cmList).Offset(-1).Limit(-1).Count(&count).Error
+	} else {
+		err = d.dbSlave.Table(model2.TAB_NAME_COMMODITY).Where("is_deleted = ? AND status = ?", false, 0).Limit(int(pageSize)).Order(orderPhrase).Offset(int(offset)).Find(&cmList).Offset(-1).Limit(-1).Count(&count).Error
+	}
+	if err != nil {
+		d.logger.Error(ctx, "Fail to get data, err: ", err.Error())
+		return nil, 0, err
+	}
+	d.logger.Info(ctx, "Get list success.")
+	return cmList, count, nil
 }
 
 func (d *CommodityDao) GetListByIds(ctx context.Context, ids []uint64) ([]*model2.Commodity, error) {

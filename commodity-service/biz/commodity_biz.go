@@ -52,6 +52,33 @@ func (b *CommodityBiz) GetCommodity(ctx context.Context, in *cmdt.GetCommodityRe
 	return nil
 }
 
+func (b *CommodityBiz) GetCommodities(ctx context.Context, in *cmdt.GetCommoditiesRequest, out *cmdt.GetCommoditiesResponse) error {
+	b.logger.Info(ctx, "Call CommodityBiz.GetCommodities, request: ", in)
+	cList, count, err := b.commodityService.GetCommodities(ctx, in.GetFilterType(), in.GetOrderType(), in.GetLimit(), in.GetOffset())
+	if err != nil {
+		b.logger.Error(ctx, "Get commodity list failed, err: ", err.Error())
+		return err
+	}
+	out.CommodityList = make([]*cmdt.CommodityItem, 0, in.GetLimit())
+	out.Count = uint64(count)
+	for _, c := range cList {
+		out.CommodityList = append(out.CommodityList, &cmdt.CommodityItem{
+			Id:        c.Id,
+			CreatorId: c.CreatorId,
+			Title:     c.Title,
+			Detail:    c.Detail,
+			Price:     c.Price,
+			Cover:     c.Cover,
+			Type:      c.Type,
+			Status:    c.Status,
+			Latitude:  c.Latitude,
+			Longitude: c.Longitude,
+		})
+	}
+	b.logger.Info(ctx, "Call CommodityBiz.GetCommodities successfully.")
+	return nil
+}
+
 func (b *CommodityBiz) GetLatestCommodityList(ctx context.Context, in *cmdt.GetLatestCommodityListRequest, out *cmdt.GetLatestCommodityListResponse) error {
 	b.logger.Info(ctx, "Call CommodityBiz.GetLatestCommodityList, request: ", in)
 	cList, err := b.commodityService.GetLatestCommodityList(ctx, in.GetLimit(), in.GetOffset())
