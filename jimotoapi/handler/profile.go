@@ -18,11 +18,11 @@ func (c *Client) GetProfile(context *gin.Context) {
 		uId = uint64(uIdI)
 	} else {
 		// 2. else use auth data
-		uIdA := c.getAuthedData(context, KEY_USER_ID)
-		if uIdA == nil {
+		authData, ok := c.ParseAuthData(context)
+		if !ok {
 			return
 		}
-		uId = uIdA.(uint64)
+		uId = authData.UserId
 	}
 	r := &account.GetProfileRequest{
 		UserId:    uId,
@@ -45,7 +45,10 @@ func (c *Client) GetProfile(context *gin.Context) {
 }
 
 func (c *Client) CreateProfile(context *gin.Context) {
-	uId := c.getAuthedData(context, KEY_USER_ID)
+	authData, ok := c.ParseAuthData(context)
+	if !ok {
+		return
+	}
 	p := &vo.CreateProfileReq{}
 	if err := context.ShouldBind(p); err != nil {
 		c.HandleRequestError(context, err)
@@ -53,7 +56,7 @@ func (c *Client) CreateProfile(context *gin.Context) {
 	}
 	r := &account.CreateProfileRequest{
 		Profile: &account.Profile{
-			UserId:   uId.(uint64),
+			UserId:   authData.UserId,
 			Username: p.Username,
 			Email:    p.Email,
 		},
@@ -68,7 +71,10 @@ func (c *Client) CreateProfile(context *gin.Context) {
 }
 
 func (c *Client) UpdateProfile(context *gin.Context) {
-	uId := c.getAuthedData(context, KEY_USER_ID)
+	authData, ok := c.ParseAuthData(context)
+	if !ok {
+		return
+	}
 	p := &vo.UpdateProfileReq{}
 	if err := context.ShouldBind(p); err != nil {
 		c.HandleRequestError(context, err)
@@ -76,7 +82,7 @@ func (c *Client) UpdateProfile(context *gin.Context) {
 	}
 	r := &account.UpdateProfileRequest{
 		Profile: &account.Profile{
-			UserId:   uId.(uint64),
+			UserId:   authData.UserId,
 			Username: p.Username,
 			Avatar:   p.AvatarUrl,
 		},

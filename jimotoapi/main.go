@@ -26,7 +26,6 @@ func main() {
 	accountApi := api.Group("account")
 	{
 		accountApi.POST("login", client.Login)
-		accountApi.POST("logout", client.Logout)
 		accountApi.POST("register", client.Register)
 		accountApi.GET("/user/id", client.Authenticate, client.GetUserId)
 
@@ -60,6 +59,7 @@ func main() {
 		commoditiesApi.GET("", client.GetCommodities)
 		commoditiesApi.GET("latest", client.GetLatestCommodityList)
 		commoditiesApi.GET("liked", client.Authenticate, client.GetUserLikeCommodities)
+		commoditiesApi.GET("sold", client.Authenticate, client.GetUserSoldCommodities)
 	}
 
 	publicServiceApi := api.Group("services")

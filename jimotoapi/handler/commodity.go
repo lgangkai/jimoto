@@ -34,7 +34,10 @@ var (
 )
 
 func (c *Client) PublishCommodity(context *gin.Context) {
-	uId := c.getAuthedData(context, KEY_USER_ID)
+	authData, ok := c.ParseAuthData(context)
+	if !ok {
+		return
+	}
 	p := &vo.PublishReq{}
 	if err := context.ShouldBind(p); err != nil {
 		c.HandleRequestError(context, err)
@@ -42,7 +45,7 @@ func (c *Client) PublishCommodity(context *gin.Context) {
 	}
 	imgs := strings.Split(p.Images, ",")
 	cm := &commodity.CommodityItem{
-		CreatorId: uId.(uint64),
+		CreatorId: authData.UserId,
 		Title:     p.Title,
 		Detail:    p.Detail,
 		Price:     p.Price,
@@ -168,14 +171,14 @@ func (c *Client) GetCommodityImages(context *gin.Context) {
 }
 
 func (c *Client) LikeCommodity(context *gin.Context) {
-	uId := c.getAuthedData(context, KEY_USER_ID)
-	cId, _ := strconv.Atoi(context.Param("commodity_id"))
-	if uId == nil {
+	authData, ok := c.ParseAuthData(context)
+	if !ok {
 		return
 	}
+	cId, _ := strconv.Atoi(context.Param("commodity_id"))
 	r := &commodity.LikeCommodityRequest{
 		Id:        uint64(cId),
-		UserId:    uId.(uint64),
+		UserId:    authData.UserId,
 		RequestId: GetRequestId(context),
 	}
 	_, err := c.commodityClient.LikeCommodity(context, r)
@@ -187,14 +190,14 @@ func (c *Client) LikeCommodity(context *gin.Context) {
 }
 
 func (c *Client) UnlikeCommodity(context *gin.Context) {
-	uId := c.getAuthedData(context, KEY_USER_ID)
-	cId, _ := strconv.Atoi(context.Param("commodity_id"))
-	if uId == nil {
+	authData, ok := c.ParseAuthData(context)
+	if !ok {
 		return
 	}
+	cId, _ := strconv.Atoi(context.Param("commodity_id"))
 	r := &commodity.UnlikeCommodityRequest{
 		Id:        uint64(cId),
-		UserId:    uId.(uint64),
+		UserId:    authData.UserId,
 		RequestId: GetRequestId(context),
 	}
 	_, err := c.commodityClient.UnlikeCommodity(context, r)
@@ -230,12 +233,12 @@ func (c *Client) GetLikedUsers(context *gin.Context) {
 }
 
 func (c *Client) GetUserLikeCommodities(context *gin.Context) {
-	uId := c.getAuthedData(context, KEY_USER_ID)
-	if uId == nil {
+	authData, ok := c.ParseAuthData(context)
+	if !ok {
 		return
 	}
 	r := &commodity.GetUserLikeCommoditiesRequest{
-		Id:        uId.(uint64),
+		Id:        authData.UserId,
 		RequestId: GetRequestId(context),
 	}
 	resp, err := c.commodityClient.GetUserLikeCommodities(context, r)
@@ -250,5 +253,29 @@ func (c *Client) GetUserLikeCommodities(context *gin.Context) {
 		return
 	}
 	c.logger.Info(c.context, "Handle GetUserLikeCommodities success, commodities: ", string(cms))
+	c.HandleSuccess(context, cms)
+}
+
+func (c *Client) GetUserSoldCommodities(context *gin.Context) {
+	authData, ok := c.ParseAuthData(context)
+	if !ok {
+		return
+	}
+	r := &commodity.GetUserSoldCommoditiesRequest{
+		UserId:    authData.UserId,
+		RequestId: GetRequestId(context),
+	}
+	resp, err := c.commodityClient.GetUserSoldCommodities(context, r)
+	if err != nil {
+		c.HandleJsonError(context, err)
+		return
+	}
+	cl := vo.FromCommodityList(resp.GetCommodityList(), c.config)
+	cms, err := json.Marshal(cl)
+	if err != nil {
+		c.HandleJsonError(context, err)
+		return
+	}
+	c.logger.Info(c.context, "Handle GetUserSoldCommodities success, commodities: ", string(cms))
 	c.HandleSuccess(context, cms)
 }

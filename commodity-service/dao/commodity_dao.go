@@ -114,6 +114,17 @@ func (d *CommodityDao) GetListByFilter(ctx context.Context, filterType cmdt.Filt
 	return cmList, count, nil
 }
 
+func (d *CommodityDao) GetListByCreatorId(ctx context.Context, creatorId uint64) ([]*model2.Commodity, error) {
+	d.logger.Info(ctx, "Call CommodityDao.GetListByCreatorId.")
+	var cmList []*model2.Commodity
+	if err := d.dbSlave.Where("creator_id = ?", creatorId).Find(&cmList).Error; err != nil {
+		d.logger.Error(ctx, "Fail to get data, err: ", err.Error())
+		return nil, err
+	}
+	d.logger.Info(ctx, "Get list success.")
+	return cmList, nil
+}
+
 func (d *CommodityDao) GetListByIds(ctx context.Context, ids []uint64) ([]*model2.Commodity, error) {
 	d.logger.Info(ctx, "Call CommodityDao.GetListByIds.")
 	var cmList []*model2.Commodity

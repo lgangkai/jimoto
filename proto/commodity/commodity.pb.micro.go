@@ -47,6 +47,7 @@ type CommodityService interface {
 	GetCommodityLikedUsers(ctx context.Context, in *GetCommodityLikedUsersRequest, opts ...client.CallOption) (*GetCommodityLikedUsersResponse, error)
 	GetUserLikeCommodities(ctx context.Context, in *GetUserLikeCommoditiesRequest, opts ...client.CallOption) (*GetUserLikeCommoditiesResponse, error)
 	GetCommodities(ctx context.Context, in *GetCommoditiesRequest, opts ...client.CallOption) (*GetCommoditiesResponse, error)
+	GetUserSoldCommodities(ctx context.Context, in *GetUserSoldCommoditiesRequest, opts ...client.CallOption) (*GetUserSoldCommoditiesResponse, error)
 }
 
 type commodityService struct {
@@ -171,6 +172,16 @@ func (c *commodityService) GetCommodities(ctx context.Context, in *GetCommoditie
 	return out, nil
 }
 
+func (c *commodityService) GetUserSoldCommodities(ctx context.Context, in *GetUserSoldCommoditiesRequest, opts ...client.CallOption) (*GetUserSoldCommoditiesResponse, error) {
+	req := c.c.NewRequest(c.name, "Commodity.GetUserSoldCommodities", in)
+	out := new(GetUserSoldCommoditiesResponse)
+	err := c.c.Call(ctx, req, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // Server API for Commodity service
 
 type CommodityHandler interface {
@@ -185,6 +196,7 @@ type CommodityHandler interface {
 	GetCommodityLikedUsers(context.Context, *GetCommodityLikedUsersRequest, *GetCommodityLikedUsersResponse) error
 	GetUserLikeCommodities(context.Context, *GetUserLikeCommoditiesRequest, *GetUserLikeCommoditiesResponse) error
 	GetCommodities(context.Context, *GetCommoditiesRequest, *GetCommoditiesResponse) error
+	GetUserSoldCommodities(context.Context, *GetUserSoldCommoditiesRequest, *GetUserSoldCommoditiesResponse) error
 }
 
 func RegisterCommodityHandler(s server.Server, hdlr CommodityHandler, opts ...server.HandlerOption) error {
@@ -200,6 +212,7 @@ func RegisterCommodityHandler(s server.Server, hdlr CommodityHandler, opts ...se
 		GetCommodityLikedUsers(ctx context.Context, in *GetCommodityLikedUsersRequest, out *GetCommodityLikedUsersResponse) error
 		GetUserLikeCommodities(ctx context.Context, in *GetUserLikeCommoditiesRequest, out *GetUserLikeCommoditiesResponse) error
 		GetCommodities(ctx context.Context, in *GetCommoditiesRequest, out *GetCommoditiesResponse) error
+		GetUserSoldCommodities(ctx context.Context, in *GetUserSoldCommoditiesRequest, out *GetUserSoldCommoditiesResponse) error
 	}
 	type Commodity struct {
 		commodity
@@ -254,4 +267,8 @@ func (h *commodityHandler) GetUserLikeCommodities(ctx context.Context, in *GetUs
 
 func (h *commodityHandler) GetCommodities(ctx context.Context, in *GetCommoditiesRequest, out *GetCommoditiesResponse) error {
 	return h.CommodityHandler.GetCommodities(ctx, in, out)
+}
+
+func (h *commodityHandler) GetUserSoldCommodities(ctx context.Context, in *GetUserSoldCommoditiesRequest, out *GetUserSoldCommoditiesResponse) error {
+	return h.CommodityHandler.GetUserSoldCommodities(ctx, in, out)
 }

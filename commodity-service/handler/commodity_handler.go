@@ -22,6 +22,10 @@ func (h *CommodityHandlerImpl) GetLatestCommodityList(ctx context.Context, in *c
 	return h.commodityBiz.GetLatestCommodityList(getTraceContext(ctx, in.RequestId, 0), in, out)
 }
 
+func (h *CommodityHandlerImpl) GetUserSoldCommodities(ctx context.Context, in *commodity.GetUserSoldCommoditiesRequest, out *commodity.GetUserSoldCommoditiesResponse) error {
+	return h.commodityBiz.GetUserSoldCommodities(getTraceContext(ctx, in.RequestId, 0), in, out)
+}
+
 func (h *CommodityHandlerImpl) PublishCommodity(ctx context.Context, in *commodity.PublishCommodityRequest, out *commodity.PublishCommodityResponse) error {
 	return h.commodityBiz.PublishCommodity(getTraceContext(ctx, in.RequestId, in.Commodity.Id), in, out)
 }

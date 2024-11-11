@@ -51,6 +51,16 @@ func (s *CommodityService) GetCommodities(ctx context.Context, filterType cmdt.F
 	return cList, count, err
 }
 
+func (s *CommodityService) GetUserSoldCommodities(ctx context.Context, creatorId uint64) ([]*model.Commodity, error) {
+	s.logger.Info(ctx, "Call CommodityService.GetUserSoldCommodities")
+	cList, err := s.commodityDao.GetListByCreatorId(ctx, creatorId)
+	if err != nil {
+		s.logger.Error(ctx, "Fail to get commodity list, err:", err.Error())
+		return nil, errs.New(errs.ERR_GET_COMMODITY_LIST_FAILED)
+	}
+	return cList, err
+}
+
 func (s *CommodityService) GetLatestCommodityList(ctx context.Context, pageSize uint64, offset uint64) ([]*model.Commodity, error) {
 	s.logger.Info(ctx, "Call CommodityService.GetLatestCommodityList")
 	cList, err := s.commodityDao.GetListLatest(ctx, pageSize, offset)

@@ -27,6 +27,7 @@ service Commodity {
   rpc GetCommodityLikedUsers(GetCommodityLikedUsersRequest) returns (GetCommodityLikedUsersResponse);
   rpc GetUserLikeCommodities(GetUserLikeCommoditiesRequest) returns (GetUserLikeCommoditiesResponse);
   rpc GetCommodities(GetCommoditiesRequest) returns (GetCommoditiesResponse);
+  rpc GetUserSoldCommodities(GetUserSoldCommoditiesRequest) returns (GetUserSoldCommoditiesResponse);
 }
 
 message CommodityItem {
@@ -147,4 +148,13 @@ message GetCommoditiesRequest {
 message GetCommoditiesResponse {
   uint64 count = 1;
   repeated CommodityItem commodity_list = 2;
+}
+
+message GetUserSoldCommoditiesRequest {
+  uint64 user_id = 1;
+  string request_id = 2;
+}
+
+message GetUserSoldCommoditiesResponse {
+  repeated CommodityItem commodity_list = 1;
 }

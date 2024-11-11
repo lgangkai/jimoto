@@ -2,10 +2,8 @@ package handler
 
 import (
 	"encoding/json"
-	errs "errs"
 	"github.com/gin-gonic/gin"
 	"jimotoapi/vo"
-	"net/http"
 	"protos/account"
 )
 
@@ -59,41 +57,14 @@ func (c *Client) Register(context *gin.Context) {
 }
 
 func (c *Client) GetUserId(context *gin.Context) {
-	value, exists := context.Get(KEY_USER_ID)
-	if !exists || value == nil {
-		context.JSON(http.StatusUnauthorized, gin.H{
-			"code": errs.ERR_AUTH_FAILED,
-			"msg":  errs.GetMsg(errs.ERR_AUTH_FAILED),
-			"data": nil,
-		})
-		context.Abort()
+	authData, ok := c.ParseAuthData(context)
+	if !ok {
 		return
 	}
-	marshal, err := json.Marshal(&vo.User{UserId: value.(uint64)})
+	marshal, err := json.Marshal(&vo.User{UserId: authData.UserId})
 	if err != nil {
 		c.HandleJsonError(context, err)
 		return
 	}
 	c.HandleSuccess(context, marshal)
-}
-
-// Logout currently just delete the token and no need to call service.
-func (c *Client) Logout(context *gin.Context) {
-	context.SetCookie(KEY_ACCESS_TOKEN, "", -1, "/", "", false, true)
-	c.HandleSuccess(context, nil)
-}
-
-func (c *Client) getAuthedData(context *gin.Context, key string) any {
-	v, ok := context.Get(key)
-	if !ok {
-		c.logger.Error(c.context, "Get data failed, key: ", key)
-		context.JSON(http.StatusUnauthorized, gin.H{
-			"code": errs.ERR_AUTH_FAILED,
-			"msg":  errs.GetMsg(errs.ERR_AUTH_FAILED),
-			"data": nil,
-		})
-		context.Abort()
-		return nil
-	}
-	return v
 }

@@ -1,12 +1,9 @@
 package handler
 
 import (
-	errs "errs"
-	"github.com/asim/go-micro/v3/errors"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	"net/http"
-	"protos/account"
 )
 
 const (
@@ -52,39 +49,10 @@ func (c *Client) Cors(ctx *gin.Context) {
 
 func (c *Client) Authenticate(context *gin.Context) {
 	c.logger.Info(c.context, "Authenticate for api request.")
-	token := context.GetHeader(KEY_ACCESS_TOKEN)
-	if token == "" {
-		c.logger.Error(c.context, "Get access_token from header failed")
-		context.JSON(http.StatusUnauthorized, gin.H{
-			"code": errs.ERR_AUTH_FAILED,
-			"msg":  errs.GetMsg(errs.ERR_AUTH_FAILED),
-			"data": nil,
-		})
-		context.Abort()
+	authData, ok := c.ParseAuthData(context)
+	if !ok {
 		return
 	}
-	c.logger.Info(c.context, "access_token: ", token)
-
-	req := &account.AuthRequest{
-		Token:     token,
-		RequestId: GetRequestId(context),
-	}
-	resp, err := c.accountClient.Authenticate(context, req)
-	if err != nil {
-		c.logger.Error(c.context, "Authenticate failed, err: ", err.Error())
-		code := errors.Parse(err.Error()).Code
-		msg := errors.Parse(err.Error()).Detail
-		context.JSON(http.StatusUnauthorized, gin.H{
-			"code": code,
-			"msg":  msg,
-			"data": nil,
-		})
-		context.Abort()
-		return
-	}
-
-	c.logger.Info(c.context, "Authenticate succeed, userId: ", resp.GetUserId())
-	context.Set(KEY_USER_ID, resp.GetUserId())
-	context.Set(KEY_EMAIL, resp.GetEmail())
+	c.logger.Info(c.context, "Authenticate succeed, authData: ", authData)
 	context.Next()
 }
