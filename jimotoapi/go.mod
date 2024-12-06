@@ -5,10 +5,10 @@ require (
 	github.com/asim/go-micro/plugins/registry/etcd/v3 v3.7.0
 	github.com/asim/go-micro/v3 v3.7.1
 	github.com/gin-gonic/gin v1.10.0
-	github.com/google/uuid v1.2.0
 	github.com/lgangkai/golog v0.0.0-20240512183325-ed012f3f7d8b
 	gopkg.in/yaml.v3 v3.0.1
 	protos v0.0.0-00010101000000-000000000000
+	github.com/google/uuid v1.2.0
 )
 
 require (
