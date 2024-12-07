@@ -54,7 +54,7 @@ func (b *CommodityBiz) GetCommodity(ctx context.Context, in *cmdt.GetCommodityRe
 
 func (b *CommodityBiz) GetCommodities(ctx context.Context, in *cmdt.GetCommoditiesRequest, out *cmdt.GetCommoditiesResponse) error {
 	b.logger.Info(ctx, "Call CommodityBiz.GetCommodities, request: ", in)
-	cList, count, err := b.commodityService.GetCommodities(ctx, in.GetFilterType(), in.GetOrderType(), in.GetLimit(), in.GetOffset())
+	cList, count, err := b.commodityService.GetCommodities(ctx, in.GetFilter(), in.GetOrderType(), in.GetLimit(), in.GetOffset())
 	if err != nil {
 		b.logger.Error(ctx, "Get commodity list failed, err: ", err.Error())
 		return err

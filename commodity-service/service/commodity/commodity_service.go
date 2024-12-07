@@ -41,15 +41,17 @@ func (s *CommodityService) GetCommodity(ctx context.Context, id uint64) (*model.
 	return commodity, nil
 }
 
-func (s *CommodityService) GetCommodities(ctx context.Context, filterType cmdt.FilterType, orderType cmdt.OrderType, pageSize uint64, offset uint64) ([]*model.Commodity, int64, error) {
+func (s *CommodityService) GetCommodities(ctx context.Context, filter *cmdt.Filter, orderType cmdt.OrderType, pageSize uint64, offset uint64) ([]*model.Commodity, int64, error) {
 	s.logger.Info(ctx, "Call CommodityService.GetCommodities")
-	cList, count, err := s.commodityDao.GetListByFilter(ctx, filterType, orderType, pageSize, offset)
+	cList, count, err := s.commodityDao.GetListByFilter(ctx, filter, orderType, pageSize, offset)
 	if err != nil {
 		s.logger.Error(ctx, "Fail to get commodity list, err:", err.Error())
 		return nil, 0, errs.New(errs.ERR_GET_COMMODITY_LIST_FAILED)
 	}
 	return cList, count, err
 }
+
+func (s *CommodityService) GetNearestCommodities() {}
 
 func (s *CommodityService) GetUserSoldCommodities(ctx context.Context, creatorId uint64) ([]*model.Commodity, error) {
 	s.logger.Info(ctx, "Call CommodityService.GetUserSoldCommodities")

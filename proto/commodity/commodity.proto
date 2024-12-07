@@ -2,9 +2,14 @@ syntax = "proto3";
 
 option go_package = "./commodity";
 
-enum FilterType {
+enum FilterPublish {
   ALL = 0;
   PUBLISHING = 1;
+}
+
+enum FilterSell {
+  SELL = 0;
+  BUY = 1;
 }
 
 enum OrderType {
@@ -42,6 +47,11 @@ message CommodityItem {
   uint32 status = 9;
   double latitude = 10;
   double longitude = 11;
+}
+
+message Filter {
+  FilterPublish filter_publish = 1;
+  FilterSell filter_sell = 2;
 }
 
 message GetCommodityRequest {
@@ -140,7 +150,7 @@ message GetUserLikeCommoditiesResponse {
 message GetCommoditiesRequest {
   uint64 limit = 1;
   uint64 offset = 2;
-  FilterType filter_type = 3;
+  Filter filter = 3;
   OrderType order_type = 4;
   string request_id = 5;
 }

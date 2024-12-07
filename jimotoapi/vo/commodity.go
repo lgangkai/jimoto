@@ -46,6 +46,7 @@ type PublishReq struct {
 	Detail    string  `form:"detail"`
 	Price     uint64  `form:"price"`
 	Images    string  `form:"images"`
+	Type      uint8   `form:"type"`
 	Latitude  float64 `form:"latitude"`
 	Longitude float64 `form:"longitude"`
 }

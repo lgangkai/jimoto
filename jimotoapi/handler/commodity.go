@@ -12,16 +12,22 @@ import (
 
 const (
 	PARAM_KEY_FILTER_TYPE = "filter_type"
+	PARAM_KEY_TYPE        = "type"
 	PARAM_KEY_ORDER_TYPE  = "order_type"
 	PARAM_KEY_PAGE        = "page"
 	PARAM_KEY_PAGE_SIZE   = "page_size"
 )
 
 var (
-	PARAM_FILTER_MAP = map[string]commodity.FilterType{
-		"":           commodity.FilterType_ALL,
-		"all":        commodity.FilterType_ALL,
-		"publishing": commodity.FilterType_PUBLISHING,
+	PARAM_FILTER_PUBLISH_MAP = map[string]commodity.FilterPublish{
+		"":           commodity.FilterPublish_ALL,
+		"all":        commodity.FilterPublish_ALL,
+		"publishing": commodity.FilterPublish_PUBLISHING,
+	}
+	PARAM_FILTER_SELL_MAP = map[string]commodity.FilterSell{
+		"":     commodity.FilterSell_SELL,
+		"sell": commodity.FilterSell_SELL,
+		"buy":  commodity.FilterSell_BUY,
 	}
 	PARAM_ORDER_MAP = map[string]commodity.OrderType{
 		"":           commodity.OrderType_LATEST,
@@ -91,15 +97,19 @@ func (c *Client) GetCommodity(context *gin.Context) {
 
 func (c *Client) GetCommodities(context *gin.Context) {
 	fType := context.Query(PARAM_KEY_FILTER_TYPE)
+	tType := context.Query(PARAM_KEY_TYPE)
 	oType := context.Query(PARAM_KEY_ORDER_TYPE)
 	page := context.Query(PARAM_KEY_PAGE)
 	pageSize := context.Query(PARAM_KEY_PAGE_SIZE)
 	r := &commodity.GetCommoditiesRequest{
-		Limit:      uint64(util.Str2Num(pageSize)),
-		Offset:     uint64(util.Str2Num(page) - 1),
-		FilterType: PARAM_FILTER_MAP[fType],
-		OrderType:  PARAM_ORDER_MAP[oType],
-		RequestId:  GetRequestId(context),
+		Limit:  uint64(util.Str2Num(pageSize)),
+		Offset: uint64((util.Str2Num(page) - 1) * util.Str2Num(pageSize)),
+		Filter: &commodity.Filter{
+			FilterPublish: PARAM_FILTER_PUBLISH_MAP[fType],
+			FilterSell:    PARAM_FILTER_SELL_MAP[tType],
+		},
+		OrderType: PARAM_ORDER_MAP[oType],
+		RequestId: GetRequestId(context),
 	}
 	resp, err := c.commodityClient.GetCommodities(context, r)
 	if err != nil {

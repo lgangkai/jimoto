@@ -85,7 +85,7 @@ func (d *CommodityDao) GetById(ctx context.Context, id uint64) (*model2.Commodit
 	return commodity, nil
 }
 
-func (d *CommodityDao) GetListByFilter(ctx context.Context, filterType cmdt.FilterType, orderType cmdt.OrderType, pageSize uint64, offset uint64) ([]*model2.Commodity, int64, error) {
+func (d *CommodityDao) GetListByFilter(ctx context.Context, filter *cmdt.Filter, orderType cmdt.OrderType, pageSize uint64, offset uint64) ([]*model2.Commodity, int64, error) {
 	d.logger.Info(ctx, "Call CommodityDao.GetListByFilter.")
 	var cmList []*model2.Commodity
 	var orderPhrase string
@@ -100,12 +100,8 @@ func (d *CommodityDao) GetListByFilter(ctx context.Context, filterType cmdt.Filt
 	default:
 		orderPhrase = "update_time desc"
 	}
-	var err error
-	if filterType == cmdt.FilterType_ALL {
-		err = d.dbSlave.Table(model2.TAB_NAME_COMMODITY).Where("is_deleted = ?", false).Limit(int(pageSize)).Order(orderPhrase).Offset(int(offset)).Find(&cmList).Offset(-1).Limit(-1).Count(&count).Error
-	} else {
-		err = d.dbSlave.Table(model2.TAB_NAME_COMMODITY).Where("is_deleted = ? AND status = ?", false, 0).Limit(int(pageSize)).Order(orderPhrase).Offset(int(offset)).Find(&cmList).Offset(-1).Limit(-1).Count(&count).Error
-	}
+	whereClause, args := buildWhereClauseByFilter(filter)
+	err := d.dbSlave.Table(model2.TAB_NAME_COMMODITY).Where(whereClause, args...).Order(orderPhrase).Limit(int(pageSize)).Offset(int(offset)).Find(&cmList).Offset(-1).Limit(-1).Count(&count).Error
 	if err != nil {
 		d.logger.Error(ctx, "Fail to get data, err: ", err.Error())
 		return nil, 0, err
@@ -208,4 +204,20 @@ func (d *CommodityDao) deleteFromCache(ctx context.Context, id uint64) {
 		d.logger.Error(ctx, "Fail to delete from cache, err: ", err.Error())
 	}
 	d.logger.Info(ctx, "Delete data from cache succeed.")
+}
+
+func buildWhereClauseByFilter(filter *cmdt.Filter) (string, []any) {
+	whereClause := ""
+	args := make([]any, 0)
+	if filter.FilterPublish == cmdt.FilterPublish_PUBLISHING {
+		whereClause += "status = ? AND "
+		args = append(args, 0)
+	}
+	whereClause += "type = ?"
+	if filter.FilterSell == cmdt.FilterSell_SELL {
+		args = append(args, 0)
+	} else {
+		args = append(args, 1)
+	}
+	return whereClause, args
 }
